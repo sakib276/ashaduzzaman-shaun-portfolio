@@ -1,0 +1,20 @@
+{
+  "name": "personal-workshop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal Portfolio & Dynamic CMS for Ashaduzzaman Shaun",
+  "type": "module",
+  "scripts": {
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "node --watch backend/src/server.js",
+    "build": "npm run build --prefix frontend",
+    "start": "node backend/src/server.js",
+    "test": "node tests/backend.test.js && node tests/frontend/helpers.test.js && node tests/frontend/portfolioController.test.js && node tests/frontend/portfolioView.test.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  }
+}

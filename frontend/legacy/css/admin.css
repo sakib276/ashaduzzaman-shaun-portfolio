@@ -1,0 +1,144 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #071412;
+
+    color: #e8f7f4;
+}
+
+.admin-container {
+    width: min(900px, 90%);
+
+    margin: 0 auto;
+}
+
+
+/* Header */
+
+.admin-header {
+    padding: 20px 0;
+
+    border-bottom:
+        1px solid #1b3732;
+
+    margin-bottom: 40px;
+}
+
+.admin-header .admin-container {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.admin-header h1 {
+    font-size: 24px;
+}
+
+.view-site-btn {
+    padding: 10px 18px;
+
+    background: #69d6c6;
+
+    color: #071412;
+
+    border-radius: 20px;
+
+    font-weight: 700;
+}
+
+
+/* Card */
+
+.admin-card {
+    background: #0c211d;
+
+    border:
+        1px solid #1c3732;
+
+    border-radius: 15px;
+
+    padding: 30px;
+
+    margin-bottom: 25px;
+}
+
+.admin-card h2 {
+    margin-bottom: 25px;
+}
+
+
+/* Form */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #91aaa5;
+
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border:
+        1px solid #29443f;
+
+    border-radius: 8px;
+
+    background: #071412;
+
+    color: #e8f7f4;
+
+    outline: none;
+
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #69d6c6;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+
+/* Button */
+
+.save-btn {
+    padding: 12px 22px;
+
+    border: none;
+
+    border-radius: 25px;
+
+    background: #69d6c6;
+
+    color: #071412;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    opacity: 0.9;
+}

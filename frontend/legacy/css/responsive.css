@@ -1,0 +1,177 @@
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 900px) {
+
+    .nav-menu {
+        gap: 15px;
+    }
+
+    .hero-container {
+        gap: 40px;
+    }
+
+    .hero h1 {
+        font-size: 55px;
+    }
+
+    .profile-circle {
+        width: 280px;
+        height: 280px;
+    }
+
+    .hero-image {
+        width: 290px;
+    }
+
+    .about-grid {
+        gap: 40px;
+    }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+
+    .nav-menu {
+        display: none;
+    }
+
+    .hire-btn {
+        padding: 9px 18px;
+    }
+
+
+    /* Hero */
+
+    .hero {
+        padding-top: 120px;
+
+        padding-bottom: 80px;
+    }
+
+    .hero-container {
+        flex-direction: column;
+
+        text-align: center;
+    }
+
+    .hero-content {
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+    }
+
+    .hero h1 {
+        font-size: 48px;
+    }
+
+    .hero-content > p {
+        font-size: 16px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+
+        width: 100%;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+        width: 100%;
+    }
+
+    .social-links {
+        justify-content: center;
+
+        flex-wrap: wrap;
+    }
+
+
+    /* Hero Image */
+
+    .hero-image {
+        width: 280px;
+
+        margin-top: 35px;
+    }
+
+    .profile-circle {
+        width: 280px;
+
+        height: 280px;
+    }
+
+    .experience-card {
+        left: -5px;
+    }
+
+
+    /* Sections */
+
+    .section {
+        padding: 80px 0;
+    }
+
+    .section-heading h2 {
+        font-size: 34px;
+    }
+
+
+    /* About */
+
+    .about-grid {
+        grid-template-columns: 1fr;
+
+        gap: 30px;
+    }
+
+
+    /* Projects */
+
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* Contact */
+
+    .contact-card {
+        padding: 30px 20px;
+    }
+}
+
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 400px) {
+
+    .hero h1 {
+        font-size: 40px;
+    }
+
+    .profile-circle {
+        width: 240px;
+        height: 240px;
+    }
+
+    .hero-image {
+        width: 240px;
+    }
+
+    .experience-card {
+        padding: 10px 14px;
+    }
+
+    .experience-card strong {
+        font-size: 23px;
+    }
+}
