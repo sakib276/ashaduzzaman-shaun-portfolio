@@ -4,6 +4,9 @@
   "private": true,
   "description": "Personal Portfolio & Dynamic CMS for Ashaduzzaman Shaun",
   "type": "module",
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
     "dev:frontend": "npm run dev --prefix frontend",
     "dev:backend": "node --watch backend/src/server.js",
