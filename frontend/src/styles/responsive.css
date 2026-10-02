@@ -63,10 +63,22 @@
         display: none;
     }
 
+    .desktop-hire-btn {
+        display: none !important;
+    }
+
+    .mobile-experience-btn {
+        display: inline-flex !important;
+    }
+
+    .island-live-badge {
+        display: none !important;
+    }
+
     .island-bar {
         height: 48px;
-        padding: 0 6px 0 12px;
-        gap: 12px;
+        padding: 0 8px 0 12px;
+        gap: 8px;
     }
 
     .dynamic-island.island-expanded {
@@ -85,44 +97,67 @@
         grid-template-columns: 1fr;
         gap: 8px;
     }
-}
-
-@media (max-width: 700px) {
-
 
     /* Hero */
 
     .hero {
-        padding-top: 120px;
-
-        padding-bottom: 80px;
+        padding-top: 105px;
+        padding-bottom: 70px;
     }
 
     .hero-container {
         flex-direction: column;
-
         text-align: center;
+        gap: 20px;
+    }
+
+    /* Place photo at the very beginning of Hero on mobile */
+    .hero-image {
+        order: -1;
+        width: 220px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    .profile-circle {
+        width: 220px;
+        height: 220px;
+    }
+
+    .experience-card {
+        left: -8px;
+        bottom: -5px;
+        padding: 8px 14px;
+        gap: 8px;
+    }
+
+    .experience-card strong {
+        font-size: 20px;
+    }
+
+    .experience-card span {
+        font-size: 11px;
     }
 
     .hero-content {
+        order: 1;
         display: flex;
-
         flex-direction: column;
-
         align-items: center;
     }
 
     .hero h1 {
-        font-size: 48px;
+        font-size: 44px;
     }
 
     .hero-content > p {
         font-size: 16px;
+        line-height: 1.65;
+        margin-bottom: 24px;
     }
 
     .hero-buttons {
         flex-direction: column;
-
         width: 100%;
     }
 
@@ -133,29 +168,8 @@
 
     .social-links {
         justify-content: center;
-
         flex-wrap: wrap;
     }
-
-
-    /* Hero Image */
-
-    .hero-image {
-        width: 280px;
-
-        margin-top: 35px;
-    }
-
-    .profile-circle {
-        width: 280px;
-
-        height: 280px;
-    }
-
-    .experience-card {
-        left: -5px;
-    }
-
 
     /* Sections */
 
@@ -167,22 +181,18 @@
         font-size: 34px;
     }
 
-
     /* About */
 
     .about-grid {
         grid-template-columns: 1fr;
-
         gap: 30px;
     }
-
 
     /* Projects */
 
     .projects-grid {
         grid-template-columns: 1fr;
     }
-
 
     /* Contact */
 
@@ -191,44 +201,52 @@
     }
 }
 
-
 @media (max-width: 480px) {
     .island-live-badge {
         display: none;
     }
-    .island-hire-btn {
-        padding: 6px 12px;
-        font-size: 12px;
+    .island-experience-btn {
+        padding: 5px 12px;
+        font-size: 11.5px;
     }
     .island-logo {
         font-size: 14px;
+    }
+    .hero h1 {
+        font-size: 38px;
     }
 }
 
 /* =========================
    SMALL MOBILE
-========================= */
+ ========================= */
 
 @media (max-width: 400px) {
 
     .hero h1 {
-        font-size: 40px;
+        font-size: 34px;
     }
 
     .profile-circle {
-        width: 240px;
-        height: 240px;
+        width: 190px;
+        height: 190px;
     }
 
     .hero-image {
-        width: 240px;
+        width: 190px;
+        margin-bottom: 15px;
     }
 
     .experience-card {
-        padding: 10px 14px;
+        padding: 6px 10px;
+        gap: 6px;
     }
 
     .experience-card strong {
-        font-size: 23px;
+        font-size: 17px;
+    }
+
+    .experience-card span {
+        font-size: 10px;
     }
 }

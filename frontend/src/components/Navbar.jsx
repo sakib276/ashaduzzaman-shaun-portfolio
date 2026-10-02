@@ -165,12 +165,22 @@ export default function Navbar({
 
           {/* Right: Actions & Island Expander */}
           <div className="island-actions">
+            {/* Desktop: Hire Me Button */}
             <a
               href="#contact"
-              className="island-hire-btn"
+              className="island-hire-btn desktop-hire-btn"
               onClick={(e) => handleNavClick(e, '#contact')}
             >
               Hire Me
+            </a>
+
+            {/* Mobile: Experience Button directly in navbar actions */}
+            <a
+              href="#experience"
+              className="island-experience-btn mobile-experience-btn"
+              onClick={(e) => handleNavClick(e, '#experience')}
+            >
+              Experience
             </a>
 
             {/* Island Expansion Trigger (Chevron / Toggle) */}

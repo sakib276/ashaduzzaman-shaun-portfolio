@@ -1,6 +1,20 @@
 import React from 'react';
 
 export default function Hero({ profile, contact }) {
+  // Render bio sentences with interactive hover effect
+  const renderBioWithHover = (bioText) => {
+    if (!bioText) return null;
+    const sentences = bioText.match(/[^.!?]+[.!?]+(?:\s|$)|[^.!?]+$/g);
+    if (!sentences || sentences.length <= 1) {
+      return <span className="hoverable-sentence">{bioText}</span>;
+    }
+    return sentences.map((sentence, idx) => (
+      <span key={idx} className="hoverable-sentence">
+        {sentence}{' '}
+      </span>
+    ));
+  };
+
   return (
     <section id="home" className="hero">
       <div className="container hero-container">
@@ -11,7 +25,7 @@ export default function Hero({ profile, contact }) {
             Hi, I'm <span id="hero-name">{profile.name}</span>
           </h1>
 
-          <p id="hero-bio">{profile.bio}</p>
+          <p id="hero-bio">{renderBioWithHover(profile.bio)}</p>
 
           <div className="hero-buttons">
             <a href="#contact" className="primary-btn">

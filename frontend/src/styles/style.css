@@ -283,6 +283,31 @@ img {
     box-shadow: 0 4px 18px rgba(105, 214, 198, 0.55);
 }
 
+.mobile-experience-btn {
+    display: none;
+}
+
+.island-experience-btn {
+    padding: 7px 15px;
+    border-radius: 9999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: rgba(105, 214, 198, 0.12);
+    border: 1px solid rgba(105, 214, 198, 0.4);
+    color: #69d6c6;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.island-experience-btn:hover {
+    background: #69d6c6;
+    color: #051412;
+    box-shadow: 0 2px 14px rgba(105, 214, 198, 0.45);
+    transform: translateY(-1px);
+}
+
 .island-expand-trigger {
     width: 32px;
     height: 32px;
@@ -674,12 +699,30 @@ img {
 
 .hero-content > p {
     color: #91aaa5;
-
     font-size: 18px;
-
+    line-height: 1.7;
     max-width: 620px;
-
     margin-bottom: 32px;
+}
+
+/* Sentence Hover & Spotlight Focus */
+.hoverable-sentence {
+    display: inline;
+    padding: 2px 4px;
+    border-radius: 6px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+.hoverable-sentence:hover {
+    color: #ffffff;
+    background: rgba(105, 214, 198, 0.12);
+    box-shadow: 0 0 16px rgba(105, 214, 198, 0.15);
+    text-shadow: 0 0 8px rgba(105, 214, 198, 0.35);
+}
+
+#hero-bio:hover .hoverable-sentence:not(:hover) {
+    opacity: 0.65;
 }
 
 
