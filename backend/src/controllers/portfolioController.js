@@ -2,6 +2,7 @@ import {
   getPortfolio,
   updateProfile,
   updateContact,
+  updateProfileAndContact,
   addAchievement,
   deleteAchievement,
   addProject,
@@ -25,13 +26,13 @@ export async function getPortfolioData(req, res) {
 export async function handleUpdateProfile(req, res) {
   try {
     const { name, bio, about, location, focus, experienceYears, image, cvUrl, contact } = req.body;
-    let updated = await updateProfile({ name, bio, about, location, focus, experienceYears, image, cvUrl });
-    if (contact) {
-      updated = await updateContact(contact);
-    }
+    const updated = await updateProfileAndContact(
+      { name, bio, about, location, focus, experienceYears, image, cvUrl },
+      contact
+    );
     return sendSuccess(res, updated, 'Profile updated successfully');
   } catch (err) {
-    return sendError(res, 'Failed to update profile', 500, err);
+    return sendError(res, 'Failed to update profile: ' + err.message, 500, err);
   }
 }
 

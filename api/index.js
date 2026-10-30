@@ -1,13 +1,10 @@
 import app from '../backend/src/app.js';
-import { connectDB } from '../backend/src/config/database.js';
-
-let isConnected = false;
+import { connectDB, getIsMongoConnected } from '../backend/src/config/database.js';
 
 export default async function handler(req, res) {
-  if (!isConnected) {
+  if (!getIsMongoConnected()) {
     try {
       await connectDB();
-      isConnected = true;
     } catch (e) {
       console.warn('MongoDB connection in serverless handler:', e.message);
     }

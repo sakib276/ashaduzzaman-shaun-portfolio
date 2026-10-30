@@ -2,6 +2,7 @@ import app from '../backend/src/app.js';
 import assert from 'assert';
 
 async function runTests() {
+  process.env.NODE_ENV = 'test';
   console.log('🧪 Starting Full-Stack Backend Integration Tests...');
   const server = app.listen(5098);
 

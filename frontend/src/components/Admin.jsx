@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { loginAdmin } from '../services/api';
+import { loginAdmin, checkHealth } from '../services/api';
 
 export default function Admin({
   portfolioData,
@@ -21,6 +21,27 @@ export default function Admin({
   const [passcode, setPasscode] = useState('');
   const [authError, setAuthError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+
+  // Database Connection Health State
+  const [dbStatus, setDbStatus] = useState({ checking: true, isConnected: false });
+
+  const verifyDbHealth = async () => {
+    try {
+      const res = await checkHealth();
+      setDbStatus({
+        checking: false,
+        isConnected: Boolean(res.isMongoConnected)
+      });
+    } catch {
+      setDbStatus({ checking: false, isConnected: false });
+    }
+  };
+
+  useEffect(() => {
+    verifyDbHealth();
+    const interval = setInterval(verifyDbHealth, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Profile form state
   const [profileForm, setProfileForm] = useState({
@@ -330,6 +351,15 @@ export default function Admin({
     }
   };
 
+  const handleDeleteItem = async (deleteFn, id, label) => {
+    try {
+      await deleteFn(id);
+      showNotification(`${label} deleted successfully!`);
+    } catch (err) {
+      showNotification(`Error: ${err.message}`);
+    }
+  };
+
   // PASSCODE LOGIN SCREEN
   if (!isAuthenticated) {
     return (
@@ -390,7 +420,13 @@ export default function Admin({
         <div className="admin-container">
           <div>
             <h1>Portfolio Admin Dashboard</h1>
-            <span style={{ fontSize: '13px', color: '#69d6c6' }}>● Cloud Database Synced</span>
+            {dbStatus.checking ? (
+              <span style={{ fontSize: '13px', color: '#94a3b8' }}>◌ Checking Database Status...</span>
+            ) : dbStatus.isConnected ? (
+              <span style={{ fontSize: '13px', color: '#4ade80', fontWeight: 600 }}>● Cloud Database Synced (MongoDB Atlas)</span>
+            ) : (
+              <span style={{ fontSize: '13px', color: '#f87171', fontWeight: 600 }}>⚠️ Cloud Database Offline (Cluster Paused?)</span>
+            )}
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
             <button
@@ -427,13 +463,62 @@ export default function Admin({
               marginBottom: '25px',
               padding: '14px 20px',
               borderRadius: '10px',
-              background: 'rgba(105, 214, 198, 0.15)',
-              border: '1px solid #69d6c6',
-              color: '#69d6c6',
+              background: notification.toLowerCase().includes('error') || notification.toLowerCase().includes('fail')
+                ? 'rgba(239, 68, 68, 0.18)'
+                : 'rgba(105, 214, 198, 0.15)',
+              border: notification.toLowerCase().includes('error') || notification.toLowerCase().includes('fail')
+                ? '1px solid #ef4444'
+                : '1px solid #69d6c6',
+              color: notification.toLowerCase().includes('error') || notification.toLowerCase().includes('fail')
+                ? '#fca5a5'
+                : '#69d6c6',
               fontWeight: 600
             }}
           >
-            ✓ {notification}
+            {notification.toLowerCase().includes('error') || notification.toLowerCase().includes('fail') ? '⚠️ ' : '✓ '}
+            {notification}
+          </div>
+        )}
+
+        {!dbStatus.isConnected && !dbStatus.checking && (
+          <div
+            style={{
+              marginBottom: '25px',
+              padding: '16px 20px',
+              borderRadius: '10px',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              color: '#fca5a5'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <strong style={{ fontSize: '15px', color: '#f87171', display: 'block', marginBottom: '6px' }}>
+                  ⚠️ MongoDB Atlas Database Paused or Offline!
+                </strong>
+                <p style={{ margin: 0, fontSize: '13px', color: '#fecaca', lineHeight: '1.5' }}>
+                  Your MongoDB Atlas free cluster was automatically paused due to inactivity. Because of this, changes cannot be saved to the database or synced to remote devices.
+                  <br />
+                  <strong>Fix:</strong> Click <strong>"Resume Cluster"</strong> in your MongoDB Atlas email / dashboard. Once unpaused (1-2 mins), click <strong>"Recheck Status"</strong> below.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={verifyDbHealth}
+                style={{
+                  padding: '9px 16px',
+                  background: '#ef4444',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                🔄 Recheck Status
+              </button>
+            </div>
           </div>
         )}
 
@@ -866,7 +951,7 @@ export default function Admin({
                     </div>
                     <button
                       type="button"
-                      onClick={() => onDeleteAchievement(item.id)}
+                      onClick={() => handleDeleteItem(onDeleteAchievement, item.id, 'Achievement')}
                       style={{
                         background: 'rgba(255, 100, 100, 0.15)',
                         border: '1px solid #ff6464',
@@ -955,7 +1040,7 @@ export default function Admin({
                     </div>
                     <button
                       type="button"
-                      onClick={() => onDeleteProject(proj.id)}
+                      onClick={() => handleDeleteItem(onDeleteProject, proj.id, 'Project')}
                       style={{
                         background: 'rgba(255, 100, 100, 0.15)',
                         border: '1px solid #ff6464',
@@ -1057,7 +1142,7 @@ export default function Admin({
                     </div>
                     <button
                       type="button"
-                      onClick={() => onDeleteExperience(exp.id)}
+                      onClick={() => handleDeleteItem(onDeleteExperience, exp.id, 'Experience')}
                       style={{
                         background: 'rgba(255, 100, 100, 0.15)',
                         border: '1px solid #ff6464',
@@ -1148,7 +1233,7 @@ export default function Admin({
                     </div>
                     <button
                       type="button"
-                      onClick={() => onDeleteEducation(edu.id)}
+                      onClick={() => handleDeleteItem(onDeleteEducation, edu.id, 'Education')}
                       style={{
                         background: 'rgba(255, 100, 100, 0.15)',
                         border: '1px solid #ff6464',

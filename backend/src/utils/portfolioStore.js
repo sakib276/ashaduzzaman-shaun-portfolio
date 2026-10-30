@@ -2,13 +2,23 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Portfolio } from '../models/portfolioModel.js';
-import { getIsMongoConnected } from '../config/database.js';
+import { connectDB, getIsMongoConnected } from '../config/database.js';
 import { defaultPortfolioData } from './seedData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_DIR = path.resolve(__dirname, '../../data');
 const DATA_FILE = path.join(DATA_DIR, 'portfolio.json');
+
+async function ensureConnection() {
+  if (!getIsMongoConnected() && process.env.MONGODB_URI) {
+    try {
+      await connectDB();
+    } catch {
+      // Connect attempt failed
+    }
+  }
+}
 
 // Memory cache fallback for serverless or ephemeral environments
 let inMemoryData = JSON.parse(JSON.stringify(defaultPortfolioData));
@@ -75,6 +85,8 @@ function writeLocalData(data) {
 }
 
 export async function getPortfolio() {
+  await ensureConnection();
+
   if (getIsMongoConnected()) {
     try {
       let doc = await Portfolio.findOne();
@@ -89,8 +101,10 @@ export async function getPortfolio() {
   return readLocalData();
 }
 
-export async function updateProfile(updates) {
-  const cleaned = cleanObject(updates);
+export async function updateProfileAndContact(profileUpdates = {}, contactUpdates = null) {
+  const cleanProfile = cleanObject(profileUpdates);
+  const cleanContact = contactUpdates ? cleanObject(contactUpdates) : null;
+  await ensureConnection();
 
   if (getIsMongoConnected()) {
     try {
@@ -98,41 +112,49 @@ export async function updateProfile(updates) {
       if (!doc) {
         doc = new Portfolio(defaultPortfolioData);
       }
-      doc.profile = { ...doc.profile.toObject(), ...cleaned };
+      if (Object.keys(cleanProfile).length > 0) {
+        doc.profile = { ...doc.profile.toObject(), ...cleanProfile };
+      }
+      if (cleanContact && Object.keys(cleanContact).length > 0) {
+        doc.contact = { ...doc.contact.toObject(), ...cleanContact };
+      }
       await doc.save();
+      const local = readLocalData();
+      if (Object.keys(cleanProfile).length > 0) {
+        local.profile = { ...local.profile, ...cleanProfile };
+      }
+      if (cleanContact && Object.keys(cleanContact).length > 0) {
+        local.contact = { ...local.contact, ...cleanContact };
+      }
+      writeLocalData(local);
       return doc.toObject();
     } catch (err) {
-      console.error('Mongo update profile error:', err.message);
+      console.error('Mongo update profile and contact error:', err.message);
+      throw new Error(`Failed to save to Cloud Database: ${err.message}`);
     }
   }
 
+  if (process.env.MONGODB_URI && process.env.NODE_ENV !== 'test') {
+    throw new Error('Cloud Database is disconnected or paused. Please resume your MongoDB Atlas cluster.');
+  }
+
   const data = readLocalData();
-  data.profile = { ...data.profile, ...cleaned };
+  if (Object.keys(cleanProfile).length > 0) {
+    data.profile = { ...data.profile, ...cleanProfile };
+  }
+  if (cleanContact && Object.keys(cleanContact).length > 0) {
+    data.contact = { ...data.contact, ...cleanContact };
+  }
   writeLocalData(data);
   return data;
 }
 
+export async function updateProfile(updates) {
+  return updateProfileAndContact(updates, null);
+}
+
 export async function updateContact(updates) {
-  const cleaned = cleanObject(updates);
-
-  if (getIsMongoConnected()) {
-    try {
-      let doc = await Portfolio.findOne();
-      if (!doc) {
-        doc = new Portfolio(defaultPortfolioData);
-      }
-      doc.contact = { ...doc.contact.toObject(), ...cleaned };
-      await doc.save();
-      return doc.toObject();
-    } catch (err) {
-      console.error('Mongo update contact error:', err.message);
-    }
-  }
-
-  const data = readLocalData();
-  data.contact = { ...data.contact, ...cleaned };
-  writeLocalData(data);
-  return data;
+  return updateProfileAndContact({}, updates);
 }
 
 export async function addAchievement(achievement) {
@@ -143,6 +165,7 @@ export async function addAchievement(achievement) {
     year: achievement.year || `${new Date().getFullYear()}`,
     badge: achievement.badge || 'Achievement'
   };
+  await ensureConnection();
 
   if (getIsMongoConnected()) {
     try {
@@ -150,10 +173,18 @@ export async function addAchievement(achievement) {
       if (!doc) doc = new Portfolio(defaultPortfolioData);
       doc.achievements.unshift(newAch);
       await doc.save();
+      const local = readLocalData();
+      local.achievements = [newAch, ...(local.achievements || [])];
+      writeLocalData(local);
       return doc.toObject();
     } catch (err) {
       console.error('Mongo add achievement error:', err.message);
+      throw new Error(`Failed to save achievement to Cloud Database: ${err.message}`);
     }
+  }
+
+  if (process.env.MONGODB_URI && process.env.NODE_ENV !== 'test') {
+    throw new Error('Cloud Database is disconnected or paused. Please resume your MongoDB Atlas cluster.');
   }
 
   const data = readLocalData();
@@ -163,17 +194,27 @@ export async function addAchievement(achievement) {
 }
 
 export async function deleteAchievement(id) {
+  await ensureConnection();
+
   if (getIsMongoConnected()) {
     try {
       let doc = await Portfolio.findOne();
       if (doc) {
         doc.achievements = doc.achievements.filter((a) => a.id !== id);
         await doc.save();
+        const local = readLocalData();
+        local.achievements = (local.achievements || []).filter((a) => a.id !== id);
+        writeLocalData(local);
         return doc.toObject();
       }
     } catch (err) {
       console.error('Mongo delete achievement error:', err.message);
+      throw new Error(`Failed to delete achievement from Cloud Database: ${err.message}`);
     }
+  }
+
+  if (process.env.MONGODB_URI && process.env.NODE_ENV !== 'test') {
+    throw new Error('Cloud Database is disconnected or paused. Please resume your MongoDB Atlas cluster.');
   }
 
   const data = readLocalData();
@@ -191,6 +232,7 @@ export async function addProject(project) {
     link: project.link || '',
     github: project.github || ''
   };
+  await ensureConnection();
 
   if (getIsMongoConnected()) {
     try {
@@ -198,10 +240,18 @@ export async function addProject(project) {
       if (!doc) doc = new Portfolio(defaultPortfolioData);
       doc.projects.unshift(newProj);
       await doc.save();
+      const local = readLocalData();
+      local.projects = [newProj, ...(local.projects || [])];
+      writeLocalData(local);
       return doc.toObject();
     } catch (err) {
       console.error('Mongo add project error:', err.message);
+      throw new Error(`Failed to save project to Cloud Database: ${err.message}`);
     }
+  }
+
+  if (process.env.MONGODB_URI && process.env.NODE_ENV !== 'test') {
+    throw new Error('Cloud Database is disconnected or paused. Please resume your MongoDB Atlas cluster.');
   }
 
   const data = readLocalData();
@@ -211,17 +261,27 @@ export async function addProject(project) {
 }
 
 export async function deleteProject(id) {
+  await ensureConnection();
+
   if (getIsMongoConnected()) {
     try {
       let doc = await Portfolio.findOne();
       if (doc) {
         doc.projects = doc.projects.filter((p) => p.id !== id);
         await doc.save();
+        const local = readLocalData();
+        local.projects = (local.projects || []).filter((p) => p.id !== id);
+        writeLocalData(local);
         return doc.toObject();
       }
     } catch (err) {
       console.error('Mongo delete project error:', err.message);
+      throw new Error(`Failed to delete project from Cloud Database: ${err.message}`);
     }
+  }
+
+  if (process.env.MONGODB_URI && process.env.NODE_ENV !== 'test') {
+    throw new Error('Cloud Database is disconnected or paused. Please resume your MongoDB Atlas cluster.');
   }
 
   const data = readLocalData();
@@ -238,6 +298,7 @@ export async function addExperience(exp) {
     period: exp.period || '2024 - Present',
     description: exp.description || ''
   };
+  await ensureConnection();
 
   if (getIsMongoConnected()) {
     try {
@@ -245,10 +306,18 @@ export async function addExperience(exp) {
       if (!doc) doc = new Portfolio(defaultPortfolioData);
       doc.experience.unshift(newExp);
       await doc.save();
+      const local = readLocalData();
+      local.experience = [newExp, ...(local.experience || [])];
+      writeLocalData(local);
       return doc.toObject();
     } catch (err) {
       console.error('Mongo add experience error:', err.message);
+      throw new Error(`Failed to save experience to Cloud Database: ${err.message}`);
     }
+  }
+
+  if (process.env.MONGODB_URI && process.env.NODE_ENV !== 'test') {
+    throw new Error('Cloud Database is disconnected or paused. Please resume your MongoDB Atlas cluster.');
   }
 
   const data = readLocalData();
@@ -258,17 +327,27 @@ export async function addExperience(exp) {
 }
 
 export async function deleteExperience(id) {
+  await ensureConnection();
+
   if (getIsMongoConnected()) {
     try {
       let doc = await Portfolio.findOne();
       if (doc) {
         doc.experience = doc.experience.filter((e) => e.id !== id);
         await doc.save();
+        const local = readLocalData();
+        local.experience = (local.experience || []).filter((e) => e.id !== id);
+        writeLocalData(local);
         return doc.toObject();
       }
     } catch (err) {
       console.error('Mongo delete experience error:', err.message);
+      throw new Error(`Failed to delete experience from Cloud Database: ${err.message}`);
     }
+  }
+
+  if (process.env.MONGODB_URI && process.env.NODE_ENV !== 'test') {
+    throw new Error('Cloud Database is disconnected or paused. Please resume your MongoDB Atlas cluster.');
   }
 
   const data = readLocalData();
@@ -284,6 +363,7 @@ export async function addEducation(edu) {
     institution: edu.institution,
     year: edu.year || `${new Date().getFullYear()}`
   };
+  await ensureConnection();
 
   if (getIsMongoConnected()) {
     try {
@@ -291,10 +371,18 @@ export async function addEducation(edu) {
       if (!doc) doc = new Portfolio(defaultPortfolioData);
       doc.education.unshift(newEdu);
       await doc.save();
+      const local = readLocalData();
+      local.education = [newEdu, ...(local.education || [])];
+      writeLocalData(local);
       return doc.toObject();
     } catch (err) {
       console.error('Mongo add education error:', err.message);
+      throw new Error(`Failed to save education to Cloud Database: ${err.message}`);
     }
+  }
+
+  if (process.env.MONGODB_URI && process.env.NODE_ENV !== 'test') {
+    throw new Error('Cloud Database is disconnected or paused. Please resume your MongoDB Atlas cluster.');
   }
 
   const data = readLocalData();
@@ -304,17 +392,27 @@ export async function addEducation(edu) {
 }
 
 export async function deleteEducation(id) {
+  await ensureConnection();
+
   if (getIsMongoConnected()) {
     try {
       let doc = await Portfolio.findOne();
       if (doc) {
         doc.education = doc.education.filter((e) => e.id !== id);
         await doc.save();
+        const local = readLocalData();
+        local.education = (local.education || []).filter((e) => e.id !== id);
+        writeLocalData(local);
         return doc.toObject();
       }
     } catch (err) {
       console.error('Mongo delete education error:', err.message);
+      throw new Error(`Failed to delete education from Cloud Database: ${err.message}`);
     }
+  }
+
+  if (process.env.MONGODB_URI && process.env.NODE_ENV !== 'test') {
+    throw new Error('Cloud Database is disconnected or paused. Please resume your MongoDB Atlas cluster.');
   }
 
   const data = readLocalData();

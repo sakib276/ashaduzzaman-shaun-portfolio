@@ -22,6 +22,22 @@ function getHeaders(token = null) {
 }
 
 /**
+ * Check backend database health status
+ */
+export async function checkHealth() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/health`);
+    if (!res.ok) {
+      return { status: 'down', isMongoConnected: false, database: 'Unreachable' };
+    }
+    const json = await res.json();
+    return json;
+  } catch (err) {
+    return { status: 'down', isMongoConnected: false, database: 'Unreachable', error: err.message };
+  }
+}
+
+/**
  * Fetch portfolio data from backend
  */
 export async function fetchPortfolio() {

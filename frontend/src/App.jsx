@@ -99,15 +99,8 @@ export default function App() {
         contact: updated.contact || { ...prev.contact, ...(profileUpdates.contact || {}) }
       }));
     } catch (e) {
-      // Offline fallback
-      setData((prev) => ({
-        ...prev,
-        profile: {
-          ...prev.profile,
-          ...profileUpdates
-        },
-        contact: profileUpdates.contact ? { ...prev.contact, ...profileUpdates.contact } : prev.contact
-      }));
+      console.error('Failed to update profile:', e);
+      throw e;
     }
   };
 
@@ -123,10 +116,8 @@ export default function App() {
         }));
       }
     } catch (e) {
-      setData((prev) => ({
-        ...prev,
-        achievements: [{ ...newAchievement, id: `ach-${Date.now()}` }, ...(prev.achievements || [])]
-      }));
+      console.error('Failed to add achievement:', e);
+      throw e;
     }
   };
 
@@ -142,10 +133,8 @@ export default function App() {
         }));
       }
     } catch (e) {
-      setData((prev) => ({
-        ...prev,
-        achievements: (prev.achievements || []).filter((a) => a.id !== id)
-      }));
+      console.error('Failed to delete achievement:', e);
+      throw e;
     }
   };
 
@@ -161,10 +150,8 @@ export default function App() {
         }));
       }
     } catch (e) {
-      setData((prev) => ({
-        ...prev,
-        projects: [{ ...newProject, id: `proj-${Date.now()}` }, ...(prev.projects || [])]
-      }));
+      console.error('Failed to add project:', e);
+      throw e;
     }
   };
 
@@ -180,10 +167,8 @@ export default function App() {
         }));
       }
     } catch (e) {
-      setData((prev) => ({
-        ...prev,
-        projects: (prev.projects || []).filter((p) => p.id !== id)
-      }));
+      console.error('Failed to delete project:', e);
+      throw e;
     }
   };
 
@@ -199,10 +184,8 @@ export default function App() {
         }));
       }
     } catch (e) {
-      setData((prev) => ({
-        ...prev,
-        experience: [{ ...newExp, id: `exp-${Date.now()}` }, ...(prev.experience || [])]
-      }));
+      console.error('Failed to add experience:', e);
+      throw e;
     }
   };
 
@@ -218,10 +201,8 @@ export default function App() {
         }));
       }
     } catch (e) {
-      setData((prev) => ({
-        ...prev,
-        experience: (prev.experience || []).filter((e) => e.id !== id)
-      }));
+      console.error('Failed to delete experience:', e);
+      throw e;
     }
   };
 
@@ -237,10 +218,8 @@ export default function App() {
         }));
       }
     } catch (e) {
-      setData((prev) => ({
-        ...prev,
-        education: [{ ...newEdu, id: `edu-${Date.now()}` }, ...(prev.education || [])]
-      }));
+      console.error('Failed to add education:', e);
+      throw e;
     }
   };
 
@@ -256,10 +235,8 @@ export default function App() {
         }));
       }
     } catch (e) {
-      setData((prev) => ({
-        ...prev,
-        education: (prev.education || []).filter((e) => e.id !== id)
-      }));
+      console.error('Failed to delete education:', e);
+      throw e;
     }
   };
 
