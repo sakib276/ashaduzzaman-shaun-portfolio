@@ -28,7 +28,7 @@ import './styles/style.css';
 import './styles/responsive.css';
 import './styles/admin.css';
 
-const STORAGE_KEY = 'portfolio_data_v3';
+const STORAGE_KEY = 'portfolio_data_v4';
 
 export default function App() {
   // Initialize state with localStorage cache or seeded defaults
