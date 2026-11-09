@@ -1,4 +1,5 @@
 import app from '../backend/src/app.js';
+import mongoose from 'mongoose';
 import assert from 'assert';
 
 async function runTests() {
@@ -104,8 +105,10 @@ async function runTests() {
     console.log('✅ Test 8: Successfully updated profile information');
 
     console.log('\n🎉 ALL 8 BACKEND & DATABASE INTEGRATION TESTS PASSED!\n');
+    process.exit(0);
   } finally {
     server.close();
+    await mongoose.disconnect();
   }
 }
 

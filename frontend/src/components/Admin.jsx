@@ -24,8 +24,10 @@ export default function Admin({
 
   // Database Connection Health State
   const [dbStatus, setDbStatus] = useState({ checking: true, isConnected: false });
+  const [isCheckingDb, setIsCheckingDb] = useState(false);
 
   const verifyDbHealth = async () => {
+    setIsCheckingDb(true);
     try {
       const res = await checkHealth();
       setDbStatus({
@@ -34,6 +36,8 @@ export default function Admin({
       });
     } catch {
       setDbStatus({ checking: false, isConnected: false });
+    } finally {
+      setIsCheckingDb(false);
     }
   };
 
@@ -505,18 +509,19 @@ export default function Admin({
               <button
                 type="button"
                 onClick={verifyDbHealth}
+                disabled={isCheckingDb}
                 style={{
                   padding: '9px 16px',
-                  background: '#ef4444',
+                  background: isCheckingDb ? '#9ca3af' : '#ef4444',
                   color: '#fff',
                   border: 'none',
                   borderRadius: '8px',
                   fontSize: '13px',
                   fontWeight: 600,
-                  cursor: 'pointer'
+                  cursor: isCheckingDb ? 'wait' : 'pointer'
                 }}
               >
-                🔄 Recheck Status
+                {isCheckingDb ? '⏳ Checking...' : '🔄 Recheck Status'}
               </button>
             </div>
           </div>
